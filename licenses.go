@@ -351,7 +351,7 @@ func scoreLicenseName(name string) float64 {
 func findLicense(info *PkgInfo) (string, error) {
 	path := info.ImportPath
 	for ; path != "."; path = filepath.Dir(path) {
-		fis, err := ioutil.ReadDir(filepath.Join(info.Root, "src", path))
+		fis, err := ioutil.ReadDir(filepath.Join(info.Root))
 		if err != nil {
 			return "", err
 		}
@@ -435,7 +435,8 @@ func listLicenses(gopath string, pkgs []string) ([]License, error) {
 			Path:    path,
 		}
 		if path != "" {
-			fpath := filepath.Join(info.Root, "src", path)
+			s := strings.Split(path, "\\")
+			fpath := filepath.Join(info.Root, s[len(s)-1])
 			m, ok := matched[fpath]
 			if !ok {
 				data, err := ioutil.ReadFile(fpath)
@@ -547,8 +548,7 @@ displayed along with its score.
 With -a, all individual packages are displayed instead of grouping them by
 license files.
 With -w, words in package license file not found in the template license are
-displayed. It helps assessing the changes importance.
-`)
+displayed. It helps assessing the changes importance.`)
 		os.Exit(1)
 	}
 	all := flag.Bool("a", false, "display all individual packages")
@@ -575,7 +575,7 @@ displayed. It helps assessing the changes importance.
 		license := "?"
 		if l.Template != nil {
 			if l.Score > .99 {
-				license = fmt.Sprintf("%s", l.Template.Title)
+				license = l.Template.Title
 			} else if l.Score >= confidence {
 				license = fmt.Sprintf("%s (%2d%%)", l.Template.Title, int(100*l.Score))
 				if *words && len(l.ExtraWords) > 0 {
