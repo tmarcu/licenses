@@ -351,7 +351,7 @@ func scoreLicenseName(name string) float64 {
 func findLicense(info *PkgInfo) (string, error) {
 	path := info.ImportPath
 	for ; path != "."; path = filepath.Dir(path) {
-		fis, err := ioutil.ReadDir(filepath.Join(info.Root))
+		fis, err := ioutil.ReadDir(info.Root)
 		if err != nil {
 			return "", err
 		}
