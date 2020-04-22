@@ -15,7 +15,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/pmezard/licenses/assets"
+	"github.com/tmarcu/licenses/assets"
 )
 
 type Template struct {
@@ -430,12 +430,17 @@ func listLicenses(gopath string, pkgs []string) ([]License, error) {
 		if err != nil {
 			return nil, err
 		}
+		// Paths like:
+		// go/pkg/mod/github.com/emicklei/go-restful@v0.0.0-20170410110728-ff4f55a20633/github.com/emicklei/go-restful/LICENSE
+		// may occur, we only want the end of it "LICENSE"
+		paths := strings.SplitAfter(path, "/")
+		newpath := paths[len(paths)-1]
 		license := License{
 			Package: info.ImportPath,
-			Path:    path,
+			Path:   newpath,
 		}
-		if path != "" {
-			s := strings.Split(path, "\\")
+		if newpath != "" {
+			s := strings.Split(newpath, "\\")
 			fpath := filepath.Join(info.Root, s[len(s)-1])
 			m, ok := matched[fpath]
 			if !ok {
@@ -496,6 +501,7 @@ func longestCommonPrefix(licenses []License) string {
 	return strings.Join(prefix, "/")
 }
 
+// TODO: fix this or remove functionality
 // groupLicenses returns the input licenses after grouping them by license path
 // and find their longest import path common prefix. Entries with empty paths
 // are left unchanged.
@@ -545,13 +551,13 @@ the package directory, and its parent directories until one is found. Files
 content is matched against a set of well-known licenses and the best match is
 displayed along with its score.
 
-With -a, all individual packages are displayed instead of grouping them by
+All individual packages are displayed instead of grouping them by
 license files.
+
 With -w, words in package license file not found in the template license are
 displayed. It helps assessing the changes importance.`)
 		os.Exit(1)
 	}
-	all := flag.Bool("a", false, "display all individual packages")
 	words := flag.Bool("w", false, "display words not matching license template")
 	flag.Parse()
 	if flag.NArg() < 1 {
@@ -564,12 +570,7 @@ displayed. It helps assessing the changes importance.`)
 	if err != nil {
 		return err
 	}
-	if !*all {
-		licenses, err = groupLicenses(licenses)
-		if err != nil {
-			return err
-		}
-	}
+
 	w := tabwriter.NewWriter(os.Stdout, 1, 4, 2, ' ', 0)
 	for _, l := range licenses {
 		license := "?"
