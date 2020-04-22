@@ -24,7 +24,7 @@ func (a asset) init() asset {
 
 func (a asset) importPath() string {
 	// filled at code gen time
-	return "github.com/pmezard/licenses/assets"
+	return "github.com/tmarcu/licenses/assets"
 }
 
 func (a asset) Open() (*os.File, error) {
