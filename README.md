@@ -5,9 +5,11 @@
 `licenses` uses `go list` tool over a Go workspace to collect the dependencies
 of a package or command, detect their license if any and match them against
 well-known templates.
+You must run this from within the root module folder.
 
 ```
-$ licenses github.com/blevesearch/bleve
+[module github.com/blevesearch/bleve]
+$ licenses ./...
 github.com/blevesearch/bleve             Apache License 2.0
 github.com/blevesearch/go-porterstemmer  MIT License (93%)
 github.com/blevesearch/segment           Apache License 2.0
@@ -19,7 +21,7 @@ vendor/golang.org/x/net/http2/hpack      ?
 
 Unmatched license words can be displayed with:
 ```
-$ licenses -w github.com/steveyen/gtreap
+$ licenses -w ./...
 github.com/steveyen/gtreap  MIT License (98%)
                             -words: mit, license
 ```
